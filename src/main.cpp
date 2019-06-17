@@ -1,5 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include"stb_image.h"
+#include "stb_image.h"
 #include "string"
 #include <fstream>
 #include <iostream>
@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 
 	for (int arg = 1; arg < argc; ++arg)
 	{
-		unsigned char* data = stbi_load(argv[arg], &w, &h, &n, 0);
+		unsigned char* data = stbi_load(argv[arg], &w, &h, &n, STBI_default);
 		std::string outName = remove_extension(argv[arg]);
 
 		auto start = outName.find_last_of("\\/");
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 			header << "const unsigned int " << imageName << "_HEIGHT = " << h << ";\n";
 			header << "const unsigned int " << imageName << "_DEPTH = " << n << ";\n";
 			for (auto& c : imageName) c = tolower(c);
-			header << "extern char " << imageName << "_data[];";
+			header << "extern unsigned char " << imageName << "_data[];";
 		}
 
 		outName +=".cpp";
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 		std::cout << outName << "\n";
 
 		out << std::showbase << std::internal << std::setfill('0') << std::hex;		
-		out << "char " << imageName << "_data[] = {\n";	
+		out << "unsigned char " << imageName << "_data[] = {\n";	
 
 		auto ptr = data;
 
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 				out << "\t";
 				for (auto c = 0; c < n; ++c)
 				{			
-					out << "\'" << std::setw(4) << static_cast<unsigned int>(*ptr++) << "\',";
+					out << std::setw(4) << +(*ptr++) << ",";
 				}
 				out << "\n";
 			}
